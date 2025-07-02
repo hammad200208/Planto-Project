@@ -52,7 +52,7 @@ const Indoor = () => {
                 care: 'Nearly indestructible, low light' 
               },
             ].map((plant, index) => (
-              <div key={index} className="bg-[#2c352b] border-1 border-[#c7c9c6] rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={index} className="bg-[#2c352b] border-1 border-[#c7c9c6] rounded-[30px] shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <img 
                   src={plant.image} 
                   alt={plant.name} 
