@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,14 +19,27 @@ const Header = () => {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex items-center gap-6 text-white/75 font-medium">
-          <li className="hover:text-green-300 cursor-pointer">Home</li>
-          <li className="relative group cursor-pointer">
+          <li className="hover:text-green-300 cursor-pointer">
+            <Link to={'/'}>
+            Home
+            </Link>
+
+
+          </li>
+          <li 
+            className="relative cursor-pointer"
+            onClick={togglePlantTypes}
+          >
             <span className="hover:text-green-300">Plant Types</span>
-            <ul className="absolute top-8 left-0 hidden group-hover:block bg-white text-gray-700 border shadow-md w-40 z-10">
-              <li className="px-4 py-2 hover:bg-green-50">Indoor</li>
-              <li className="px-4 py-2 hover:bg-green-50">Outdoor</li>
-              <li className="px-4 py-2 hover:bg-green-50">Succulents</li>
-            </ul>
+            {isPlantTypesOpen && (
+              <ul className="absolute top-8 left-0 bg-white text-gray-700 border shadow-md w-40 z-10">
+                <li className="px-4 py-2 hover:bg-green-50">
+                  <Link to="/indoor">Indoor</Link>
+                </li>
+                <li className="px-4 py-2 hover:bg-green-50">Outdoor</li>
+                <li className="px-4 py-2 hover:bg-green-50">Succulents</li>
+              </ul>
+            )}
           </li>
           <li className="hover:text-green-300 cursor-pointer">More</li>
           <li className="hover:text-green-300 cursor-pointer">Contact</li>

@@ -66,7 +66,7 @@ const Footer = () => {
               SUBSCRIBE
             </button>
           </div>
-          <p className="pt-24 text-sm text-[#cccdcb] text-center md:text-left">© Planto. All rights reserved.</p>
+          <p className="pt-5 md:pt-24 text-sm text-[#cccdcb] text-center md:text-left">Planto. © All rights reserved.</p>
         </div>
       </div>
     </footer>
