@@ -5,7 +5,7 @@ import TrendyPlants from '../components/OurTrendyPlantSection/TrendyPlants';
 import SellingCards from '../components/OurTopSellingCards/SellingCards';
 import Review from '../components/CustomerReview/Review';
 import O2Card from '../components/OurBestO2/O2Card';
-import Footer from '../components/resuablecomp/footer';
+import Footer from '../components/resuablecomp/Footer';
 
 const Planto = () => {
   return (

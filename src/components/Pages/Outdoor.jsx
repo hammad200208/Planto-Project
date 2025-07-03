@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
 
-const Indoor = () => {
+const Outdoor = () => {
   return (
     <>
       <div className='bg-[#1c261a]'>
@@ -12,7 +12,7 @@ const Indoor = () => {
         {/* Centered header */}
         <header className="bg-[#1e2619] py-6 px-5">
           <div className="max-w-6xl mx-auto text-center">
-            <h1 className="text-2xl font-bold text-white/75">Indoor Plants</h1>
+            <h1 className="text-2xl font-bold text-white/75">Outdoor Plants</h1>
           </div>
         </header>
 
@@ -22,34 +22,34 @@ const Indoor = () => {
             {/* Plant cards with PNG images */}
             {[
               { 
-                name: 'Realistic Plant', 
-                image: '/indoor/plant3.webp', 
-                care: 'Low maintenance, purifies air' 
+                name: 'Rose Bush', 
+                image: '/outdoor/plant1.webp', 
+                care: 'Beautiful blooms, needs full sun' 
               },
               { 
-                name: 'Banana Plant', 
-                image: '/indoor/plant2.png', 
-                care: 'Tropical beauty, medium light' 
+                name: 'Lavender', 
+                image: '/outdoor/plant2.webp', 
+                care: 'Fragrant, drought resistant' 
               },
               { 
-                name: 'Realistic Plant', 
-                image: '/indoor/plant3.webp', 
-                care: 'Statement plant, bright indirect light' 
+                name: 'Boxwood Shrub', 
+                image: '/outdoor/plant1.webp', 
+                care: 'Great for hedges, easy to shape' 
               },
               { 
-                name: 'Realistic Plant', 
-                image: '/indoor/plant3.webp', 
-                care: 'Great for beginners, versatile' 
+                name: 'Hydrangea', 
+                image: '/outdoor/plant2.webp', 
+                care: 'Large colorful blooms, partial shade' 
               },
               { 
-                name: 'Banana Plant', 
-                image: '/indoor/plant2.png', 
-                care: 'Glossy leaves, drought tolerant' 
+                name: 'Japanese Maple', 
+                image: '/outdoor/plant1.webp', 
+                care: 'Ornamental tree, stunning foliage' 
               },
               { 
-                name: 'Realistic Plant', 
-                image: '/indoor/plant3.webp', 
-                care: 'Nearly indestructible, low light' 
+                name: 'Succulent Garden', 
+                image: '/outdoor/plant2.webp', 
+                care: 'Low water needs, full sun' 
               },
             ].map((plant, index) => (
               <div key={index} className="bg-[#2c352b] border-1 border-[#c7c9c6] rounded-[30px] shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -71,16 +71,16 @@ const Indoor = () => {
           </div>
 
           {/* Centered "View More" button */}
-          <div className="flex justify-center mt-8 w-full">
-            <button className="bg-transparent border border-white hover:bg-[#151d14] hover:text-white text-white px-6 py-3 rounded-md transition-all duration-300 ease-in-out text-lg">
+         <div className="flex justify-center mt-8 w-full">
+        <button className="bg-transparent border border-white hover:bg-[#151d14] hover:text-white text-white px-6 py-3 rounded-md transition-all duration-300 ease-in-out text-lg">
          View More
         </button>
-          </div>
+        </div>
         </main>
-      </div>
-      <Footer />
+        </div>
+        <Footer />
     </>
   );
 };
 
-export default Indoor;
+export default Outdoor;
