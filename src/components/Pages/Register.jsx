@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { FaFacebook } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
 
@@ -12,6 +12,9 @@ const Register = () => {
     password: '',
     confirmPassword: ''
   });
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +28,14 @@ const Register = () => {
     e.preventDefault();
     // Add registration logic here
     console.log('Registration submitted:', formData);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -87,17 +98,28 @@ const Register = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-[#cbcdca]">
                   Password
                 </label>
-                <div className="mt-1">
+                <div className="mt-1 relative">
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300"
+                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300 pr-10"
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#cbcdca] hover:text-white"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-4 w-4" />
+                    ) : (
+                      <FaEye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -105,17 +127,28 @@ const Register = () => {
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#cbcdca]">
                   Confirm Password
                 </label>
-                <div className="mt-1">
+                <div className="mt-1 relative">
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     autoComplete="new-password"
                     required
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300"
+                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300 pr-10"
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#cbcdca] hover:text-white"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    {showConfirmPassword ? (
+                      <FaEyeSlash className="h-4 w-4" />
+                    ) : (
+                      <FaEye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 
