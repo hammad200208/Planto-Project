@@ -40,12 +40,12 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap items-center gap-4">
-            <button className="flex items-center gap-2 px-4 sm:px-6 py-2 text-white rounded-[15px] border border-white text-sm sm:text-base">
+            <button className="flex items-center gap-2 px-4 sm:px-6 py-2 text-white rounded-[15px] border border-white hover:bg-[#3f483f] cursor-pointer text-sm sm:text-base">
               Explore
             </button>
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border border-white rounded-full">
-                <FaPlay className="text-white text-sm sm:text-base" />
+                <FaPlay className="text-white text-sm sm:text-base " />
               </div>
               <p className="text-white text-sm">Live Demo...</p>
             </div>
@@ -94,7 +94,7 @@ const HeroSection = () => {
             <div className="flex flex-col items-start px-4 sm:px-5 mt-12">
               <p className="text-white mb-1 mt-4 text-sm sm:text-base">{current.subtitle}</p>
               <h1 className="text-[#FFFFFFBF] text-xl sm:text-2xl mb-4">{current.title}</h1>
-              <button className="text-[#FFFFFFBF] border border-[#FFFFFFBF] px-4 py-2 rounded-[15px] text-sm sm:text-base">
+              <button className="text-[#FFFFFFBF] border border-[#FFFFFFBF] px-4 py-2 rounded-[15px] text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
                 Buy Now
               </button>
             </div>

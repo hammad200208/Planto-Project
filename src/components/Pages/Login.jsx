@@ -20,7 +20,7 @@ const Login = () => {
       <div className='bg-[#1c261a]'>
         <Header />
       </div>
-      <div className="min-h-screen bg-[#1c261a] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#1c261a] flex flex-col justify-center md:pb-10 sm:px-6 lg:px-8">
         <header className="bg-[#1e2619] py-6 px-5 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-white/75">Welcome Back</h1>
@@ -110,7 +110,7 @@ const Login = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-2 gap-3">
+                <div className="mt-6 grid grid-cols-1 gap-3">
                   <div>
                     <button
                       type="button"
@@ -118,16 +118,6 @@ const Login = () => {
                     >
                       <FcGoogle className="h-5 w-5 mr-2" />
                       Google
-                    </button>
-                  </div>
-
-                  <div>
-                    <button
-                      type="button"
-                      className="w-full inline-flex justify-center items-center py-2 px-4 border border-[#c7c9c6] rounded-md shadow-sm bg-[#2c352b] text-sm font-medium text-white hover:bg-[#1e2619] transition-all duration-300"
-                    >
-                      <FaFacebook className="h-5 w-5 mr-2 text-blue-500" />
-                      Facebook
                     </button>
                   </div>
                 </div>

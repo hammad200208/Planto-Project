@@ -6,6 +6,7 @@ import Outdoor from "./components/Pages/Outdoor";
 import Succulents from "./components/Pages/Succulents";
 import Contact from "./components/Pages/Contact";
 import Login from "./components/Pages/Login";
+import Register from "./components/Pages/Register";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/succulents" element={<Succulents/>} />
         <Route path="/contact" element={<Contact/>} />
         <Route path="/login" element={<Login/>} />
+        <Route path="/register" element={<Register/>} />
       </Routes>
     </Router>
   );

@@ -49,10 +49,10 @@ const TrendyPlants = () => {
               <p className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Rs.599/-</p>
             </div>
             <div className="flex items-center gap-3 sm:gap-4">
-              <button className="bg-transparent text-white px-4 sm:px-5 py-1 sm:py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base">
+              <button className="bg-transparent text-white px-4 sm:px-5 py-1 sm:py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
                 Buy Now
               </button>
-              <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px]">
+              <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px] hover:bg-[#3f483f] cursor-pointer">
                 <BagIcon />
               </button>
             </div>
@@ -79,10 +79,10 @@ const TrendyPlants = () => {
               <p className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Rs.599/-</p>
             </div>
             <div className="flex items-center gap-3 sm:gap-4">
-              <button className="bg-transparent text-white px-4 sm:px-5 py-1 sm:py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base">
+              <button className="bg-transparent text-white px-4 sm:px-5 py-1 sm:py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
                 Buy Now
               </button>
-              <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px]">
+              <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px] hover:bg-[#3f483f] cursor-pointer">
                 <BagIcon />
               </button>
             </div>
