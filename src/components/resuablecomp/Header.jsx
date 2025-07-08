@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../Context/AuthContext'; // Adjust the path if needed
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPlantTypesOpen, setIsPlantTypesOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(prev => !prev);
   const togglePlantTypes = () => setIsPlantTypesOpen(prev => !prev);
   const closeMenu = () => setIsMenuOpen(false);
-  const handleLogout = () => setIsLoggedIn(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <>
-      {/* Navigation */}
       <nav className="flex items-center justify-between px-5 py-10">
         <div className="flex items-center">
           <img src="/g4.png" alt="Logo" className="w-[100px] h-[100px] -mt-12" />
@@ -26,10 +31,7 @@ const Header = () => {
             <li className="hover:text-green-300 cursor-pointer">
               <Link to={'/'}>Home</Link>
             </li>
-            <li 
-              className="relative cursor-pointer"
-              onClick={togglePlantTypes}
-            >
+            <li className="relative cursor-pointer" onClick={togglePlantTypes}>
               <span className="hover:text-green-300">Plant Types</span>
               {isPlantTypesOpen && (
                 <ul className="absolute top-8 left-0 bg-white text-gray-700 border shadow-md w-40 z-10">
@@ -53,13 +55,12 @@ const Header = () => {
 
         {/* Right Icons and Auth Buttons */}
         <div className="flex items-center gap-4 text-white">
-          {/* Search and Bag Icons */}
           <img src="/search.png" alt="Search" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
           <img src="/bag.png" alt="Bag" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
           
-          {/* Auth Buttons */}
+          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3 ml-2">
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <button 
                 onClick={handleLogout}
                 className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm"
@@ -83,7 +84,7 @@ const Header = () => {
               </>
             )}
           </div>
-          
+
           {/* Mobile Menu Button */}
           <img
             src="/hamburger.png"
@@ -105,8 +106,7 @@ const Header = () => {
             >
               Home
             </Link>
-            
-            {/* Toggleable Plant Types Submenu */}
+
             <div>
               <span
                 className="block hover:text-green-300 cursor-pointer"
@@ -116,41 +116,20 @@ const Header = () => {
               </span>
               {isPlantTypesOpen && (
                 <div className="ml-4 mt-2 space-y-1 text-sm">
-                  <Link 
-                    to="/indoor" 
-                    className="block hover:text-green-300 cursor-pointer"
-                    onClick={closeMenu}
-                  >
-                    Indoor
-                  </Link>
-                  <Link 
-                    to="/outdoor" 
-                    className="block hover:text-green-300 cursor-pointer"
-                    onClick={closeMenu}
-                  >
-                    Outdoor
-                  </Link>
-                  <Link 
-                    to="/succulents" 
-                    className="block hover:text-green-300 cursor-pointer"
-                    onClick={closeMenu}
-                  >
-                    Succulents
-                  </Link>
+                  <Link to="/indoor" onClick={closeMenu} className="block hover:text-green-300">Indoor</Link>
+                  <Link to="/outdoor" onClick={closeMenu} className="block hover:text-green-300">Outdoor</Link>
+                  <Link to="/succulents" onClick={closeMenu} className="block hover:text-green-300">Succulents</Link>
                 </div>
               )}
             </div>
-            <Link 
-              to="/contact" 
-              className="cursor-pointer hover:text-green-300"
-              onClick={closeMenu}
-            >
+
+            <Link to="/contact" onClick={closeMenu} className="cursor-pointer hover:text-green-300">
               Contact
             </Link>
 
             {/* Mobile Auth Buttons */}
             <div className="flex flex-col gap-2 mt-4">
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <button 
                   onClick={() => {
                     handleLogout();
@@ -162,18 +141,10 @@ const Header = () => {
                 </button>
               ) : (
                 <>
-                  <Link 
-                    to="/login"
-                    onClick={closeMenu}
-                    className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm"
-                  >
+                  <Link to="/login" onClick={closeMenu} className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">
                     Login
                   </Link>
-                  <Link 
-                    to="/register"
-                    onClick={closeMenu}
-                    className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm"
-                  >
+                  <Link to="/register" onClick={closeMenu} className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">
                     Register
                   </Link>
                 </>

@@ -4,8 +4,11 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
+import { useNavigate } from 'react-router-dom';
+
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,11 +27,42 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add registration logic here
-    console.log('Registration submitted:', formData);
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  navigate('/login');
+
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  const { name, email, password, confirmPassword } = formData;
+
+  try {
+    const response = await fetch('https://eb-project-backend-production.up.railway.app/api/v0/user/createUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, email, password, confirmPassword })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("User registered successfully!");
+      console.log("Success:", data);
+      // Optionally redirect to login
+    } else {
+      alert(data.message || "Registration failed!");
+      console.error("Error:", data);
+    }
+  } catch (error) {
+    alert("Network error or server not responding.");
+    console.error("Error:", error);
+  }
+};
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
