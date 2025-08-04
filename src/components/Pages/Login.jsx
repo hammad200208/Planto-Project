@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://eb-project-backend-production.up.railway.app/api/v0/user/loginUser', {
+      const response = await fetch('https://eb-project-backend-kappa.vercel.app/api/v0/user/loginUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -29,7 +29,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Login successful!');
+        // alert('Login successful!');
         console.log('User:', data);
         localStorage.setItem('authToken', data.token);
         login(data.token); // ✅ update context & save token

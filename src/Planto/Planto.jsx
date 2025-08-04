@@ -13,7 +13,7 @@ const Planto = () => {
       <div className="bg-[url('/bgdark.png')] bg-cover bg-center w-full min-h-screen">
         <Header />
         <HeroSection />
-        <TrendyPlants />
+         <TrendyPlants /> 
       </div>
 
       <div className="bg-[#262e24]">

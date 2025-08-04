@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
-import { useNavigate } from 'react-router-dom';
-
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,7 +13,7 @@ const Register = () => {
     password: '',
     confirmPassword: ''
   });
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -28,49 +26,43 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  navigate('/login');
+    e.preventDefault();
 
-  if (formData.password !== formData.confirmPassword) {
-    alert("Passwords do not match!");
-    return;
-  }
-
-  const { name, email, password, confirmPassword } = formData;
-
-  try {
-    const response = await fetch('https://eb-project-backend-production.up.railway.app/api/v0/user/createUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name, email, password, confirmPassword })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("User registered successfully!");
-      console.log("Success:", data);
-      // Optionally redirect to login
-    } else {
-      alert(data.message || "Registration failed!");
-      console.error("Error:", data);
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
     }
-  } catch (error) {
-    alert("Network error or server not responding.");
-    console.error("Error:", error);
-  }
-};
 
+    const { name, email, password, confirmPassword } = formData;
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    try {
+      const response = await fetch('https://eb-project-backend-kappa.vercel.app/api/v0/user/createUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email, password, confirmPassword })
+      });
+
+      const data = await response.json();
+      console.log("Full response:", data); // Debugging aid
+
+      if (response.ok) {
+        // alert("User registered successfully!");
+        console.log("Success:", data);
+        navigate('/login');
+      } else {
+        alert(data.message || "Registration failed!");
+        console.error("Error:", data);
+      }
+    } catch (error) {
+      alert("Network error or server not responding.");
+      console.error("Error:", error);
+    }
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   return (
     <>
@@ -78,113 +70,50 @@ const Register = () => {
         <Header />
       </div>
       <div className="min-h-screen bg-[#1c261a] flex flex-col justify-center md:pb-10 sm:px-6 lg:px-8">
-        {/* Centered header */}
         <header className="bg-[#1e2619] py-6 px-5 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-white/75">Create Account</h1>
-            <p className="mt-2 text-sm text-[#cbcdca]">
-              Join the Planto. community today
-            </p>
+            <p className="mt-2 text-sm text-[#cbcdca]">Join the Planto. community today</p>
           </div>
         </header>
 
-        {/* Main content */}
         <main className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-[#2c352b] border border-[#c7c9c6] rounded-[30px] py-8 px-6 shadow-md sm:rounded-lg sm:px-10">
+          <div className="bg-[#2c352b] border border-[#c7c9c6] rounded-[30px] py-8 px-6 shadow-md sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-[#cbcdca]">
-                  Full Name
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#cbcdca]">
-                  Email address
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-[#cbcdca]">
-                  Password
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300 pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#cbcdca] hover:text-white"
-                    onClick={togglePasswordVisibility}
-                  >
-                    {showPassword ? (
-                      <FaEyeSlash className="h-4 w-4" />
-                    ) : (
-                      <FaEye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#cbcdca]">
-                  Confirm Password
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    required
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300 pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#cbcdca] hover:text-white"
-                    onClick={toggleConfirmPasswordVisibility}
-                  >
-                    {showConfirmPassword ? (
-                      <FaEyeSlash className="h-4 w-4" />
-                    ) : (
-                      <FaEye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
+              <InputField
+                id="name"
+                name="name"
+                label="Full Name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+              />
+              <InputField
+                id="email"
+                name="email"
+                label="Email address"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              <PasswordField
+                id="password"
+                name="password"
+                label="Password"
+                show={showPassword}
+                toggleShow={togglePasswordVisibility}
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <PasswordField
+                id="confirmPassword"
+                name="confirmPassword"
+                label="Confirm Password"
+                show={showConfirmPassword}
+                toggleShow={toggleConfirmPasswordVisibility}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
 
               <div className="flex items-center">
                 <input
@@ -199,47 +128,18 @@ const Register = () => {
                 </label>
               </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#1c261a] bg-green-300 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-300 transition-all duration-300"
-                >
-                  Create Account
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#1c261a] bg-green-300 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-300 transition-all duration-300"
+              >
+                Create Account
+              </button>
             </form>
-
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#c7c9c6]" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-[#2c352b] text-[#cbcdca]">
-                    Or sign up with
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-1 gap-3">
-                <div>
-                  <button
-                    type="button"
-                    className="w-full inline-flex justify-center items-center py-2 px-4 border border-[#c7c9c6] rounded-md shadow-sm bg-[#2c352b] text-sm font-medium text-white hover:bg-[#1e2619] transition-all duration-300"
-                  >
-                    <FcGoogle className="h-5 w-5 mr-2" />
-                    Google
-                  </button>
-                </div>
-              </div>
-            </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-[#cbcdca]">
                 Already have an account?{' '}
-                <Link to="/login" className="font-medium text-green-300 hover:text-green-200">
-                  Sign in
-                </Link>
+                <Link to="/login" className="font-medium text-green-300 hover:text-green-200">Sign in</Link>
               </p>
             </div>
           </div>
@@ -249,5 +149,52 @@ const Register = () => {
     </>
   );
 };
+
+// 🔹 Reusable InputField
+const InputField = ({ id, name, label, type, value, onChange }) => (
+  <div>
+    <label htmlFor={id} className="block text-sm font-medium text-[#cbcdca]">
+      {label}
+    </label>
+    <div className="mt-1">
+      <input
+        id={id}
+        name={name}
+        type={type}
+        required
+        value={value}
+        onChange={onChange}
+        className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300"
+      />
+    </div>
+  </div>
+);
+
+// 🔹 Reusable PasswordField
+const PasswordField = ({ id, name, label, value, onChange, show, toggleShow }) => (
+  <div>
+    <label htmlFor={id} className="block text-sm font-medium text-[#cbcdca]">
+      {label}
+    </label>
+    <div className="mt-1 relative">
+      <input
+        id={id}
+        name={name}
+        type={show ? "text" : "password"}
+        required
+        value={value}
+        onChange={onChange}
+        className="w-full bg-[#1e2619] border border-[#c7c9c6] rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-green-300 pr-10"
+      />
+      <button
+        type="button"
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#cbcdca] hover:text-white"
+        onClick={toggleShow}
+      >
+        {show ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+      </button>
+    </div>
+  </div>
+);
 
 export default Register;
