@@ -29,7 +29,7 @@ const Header = () => {
         <div className="hidden md:flex items-center gap-6">
           <ul className="flex items-center gap-6 text-white/75 font-medium">
             <li className="hover:text-green-300 cursor-pointer">
-              <Link to={'/'}>Home</Link>
+              <Link to="/">Home</Link>
             </li>
             <li className="relative cursor-pointer" onClick={togglePlantTypes}>
               <span className="hover:text-green-300">Plant Types</span>
@@ -56,12 +56,16 @@ const Header = () => {
         {/* Right Icons and Auth Buttons */}
         <div className="flex items-center gap-4 text-white">
           <img src="/search.png" alt="Search" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
-          <img src="/bag.png" alt="Bag" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
           
+          {/* ✅ Updated: Cart Icon navigates to /addtocart */}
+          <Link to="/addtocard">
+            <img src="/bag.png" alt="Bag" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
+          </Link>
+
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3 ml-2">
             {isAuthenticated ? (
-              <button 
+              <button
                 onClick={handleLogout}
                 className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm"
               >
@@ -69,13 +73,13 @@ const Header = () => {
               </button>
             ) : (
               <>
-                <Link 
+                <Link
                   to="/login"
                   className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm"
                 >
                   Login
                 </Link>
-                <Link 
+                <Link
                   to="/register"
                   className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm"
                 >
@@ -99,19 +103,10 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-[#1e2619] text-white/75 px-5 py-4 space-y-3 transition-all duration-300 ease-in-out">
           <div className="flex flex-col gap-2 font-medium">
-            <Link 
-              to="/" 
-              className="cursor-pointer hover:text-green-300"
-              onClick={closeMenu}
-            >
-              Home
-            </Link>
+            <Link to="/" onClick={closeMenu} className="cursor-pointer hover:text-green-300">Home</Link>
 
             <div>
-              <span
-                className="block hover:text-green-300 cursor-pointer"
-                onClick={togglePlantTypes}
-              >
+              <span onClick={togglePlantTypes} className="block hover:text-green-300 cursor-pointer">
                 Plant Types
               </span>
               {isPlantTypesOpen && (
@@ -123,14 +118,12 @@ const Header = () => {
               )}
             </div>
 
-            <Link to="/contact" onClick={closeMenu} className="cursor-pointer hover:text-green-300">
-              Contact
-            </Link>
+            <Link to="/contact" onClick={closeMenu} className="cursor-pointer hover:text-green-300">Contact</Link>
 
             {/* Mobile Auth Buttons */}
             <div className="flex flex-col gap-2 mt-4">
               {isAuthenticated ? (
-                <button 
+                <button
                   onClick={() => {
                     handleLogout();
                     closeMenu();
@@ -141,12 +134,8 @@ const Header = () => {
                 </button>
               ) : (
                 <>
-                  <Link to="/login" onClick={closeMenu} className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">
-                    Login
-                  </Link>
-                  <Link to="/register" onClick={closeMenu} className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">
-                    Register
-                  </Link>
+                  <Link to="/login" onClick={closeMenu} className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">Login</Link>
+                  <Link to="/register" onClick={closeMenu} className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">Register</Link>
                 </>
               )}
             </div>

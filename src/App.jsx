@@ -7,6 +7,7 @@ import Contact from "./components/Pages/Contact";
 import Login from "./components/Pages/Login";
 import Register from "./components/Pages/Register";
 import AuthProvider from "./Context/AuthProvider"; // ✅ Corrected
+import AddToCard from "./components/Pages/AddToCard"
 import "./App.css";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/addtocard" element={<AddToCard />} />
         </Routes>
       </Router>
     </AuthProvider>
