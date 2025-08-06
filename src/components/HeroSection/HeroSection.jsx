@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { FaStar, FaPlay, FaStarHalfAlt, FaArrowRight } from 'react-icons/fa';
+import { useCart } from "../../Context/CartContext"; // ✅ Import context
 
 const HeroSection = () => {
   const [productCards, setProductCards] = useState([]);
   const [index, setIndex] = useState(0);
+  const { addToCart } = useCart(); // ✅ Destructure addToCart from context
 
+  // Fetch plants from API
   useEffect(() => {
     fetch('https://eb-project-backend-kappa.vercel.app/api/v0/plants/getAll')
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched plants:", data.data); // Debug
-        // if (data?.plants && Array.isArray(data.plants)) {
-        //   const validPlants = data.plants.filter(
-        //     (plant) =>
-        //       typeof plant.image === 'string' &&
-        //       plant.image.includes('uploads') &&
-        //       plant.plantname &&
-        //       plant.description
-        //   );
-          setProductCards(data.data); // Take first 3
-        // }
+        console.log("Fetched plants:", data.data);
+        setProductCards(data.data);
       })
       .catch((err) => console.error('Failed to fetch hero plants:', err));
   }, []);
@@ -28,12 +22,25 @@ const HeroSection = () => {
     image: '',
     plantname: 'Loading...',
     description: 'Please wait while we load the plant info.',
+    price: '...',
+    _id: null
   };
-console.log("current",current)
-  // const imageUrl = current.image
-  //   ? `${current.image}`
-  //   : '/placeholder.png';
-// console.log("Current plant:", imageUrl); // Debug
+
+  // ✅ Replace localStorage logic with Context
+  const handleBuyNow = () => {
+    if (!current._id) return;
+
+    const productToAdd = {
+      id: current._id,
+      name: current.plantname,
+      price: current.price,
+      image: current.image,
+    };
+
+    addToCart(productToAdd);
+    alert("Added to cart!");
+  };
+
   const nextCard = () => {
     setIndex((prevIndex) => (prevIndex + 1) % productCards.length);
   };
@@ -98,7 +105,7 @@ console.log("current",current)
             {/* Floating Image */}
             <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
               <img
-                src={current.image ? current.image : null}
+                src={current.image || "/placeholder.png"}
                 alt={current.plantname}
                 className="w-[120px] sm:w-[150px] h-[160px] sm:h-[180px] object-cover rounded"
               />
@@ -107,10 +114,12 @@ console.log("current",current)
             {/* Card Content */}
             <div className="flex flex-col items-start px-4 sm:px-5 mt-12">
               <p className="text-white mb-1 mt-4 text-sm sm:text-base">{current.description}</p>
-              {/* <p><img src={current.image ? current.image : null} alt="this image" />/</p> */}
               <h1 className="text-[#FFFFFFBF] text-xl sm:text-2xl mb-1">{current.plantname}</h1>
               <p className="text-white text-sm sm:text-base mb-4">Rs. {current.price}/-</p>
-              <button className="text-[#FFFFFFBF] border border-[#FFFFFFBF] px-4 py-2 rounded-[15px] text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
+              <button
+                onClick={handleBuyNow}
+                className="text-[#FFFFFFBF] border border-[#FFFFFFBF] px-4 py-2 rounded-[15px] text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer"
+              >
                 Buy Now
               </button>
             </div>

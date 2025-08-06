@@ -1,11 +1,15 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../Context/AuthContext'; // Adjust the path if needed
+import { AuthContext } from '../../Context/AuthContext';
+import { useCart } from '../../Context/CartContext'; // ✅ Use the cart context directly
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPlantTypesOpen, setIsPlantTypesOpen] = useState(false);
   const { isAuthenticated, logout } = useContext(AuthContext);
+  const { getTotalQuantity } = useCart(); // ✅ Get quantity from context
+  const cartCount = getTotalQuantity(); // ✅ Auto-updated
+
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(prev => !prev);
@@ -53,16 +57,21 @@ const Header = () => {
           </ul>
         </div>
 
-        {/* Right Icons and Auth Buttons */}
-        <div className="flex items-center gap-4 text-white">
+        {/* Right Icons */}
+        <div className="flex items-center gap-4 text-white relative">
           <img src="/search.png" alt="Search" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
-          
-          {/* ✅ Updated: Cart Icon navigates to /addtocart */}
-          <Link to="/addtocard">
+
+          {/* ✅ Live Cart Icon */}
+          <Link to="/addtocard" className="relative">
             <img src="/bag.png" alt="Bag" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
           </Link>
 
-          {/* Desktop Auth Buttons */}
+          {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3 ml-2">
             {isAuthenticated ? (
               <button
@@ -89,7 +98,7 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu */}
           <img
             src="/hamburger.png"
             alt="Menu"
@@ -99,12 +108,11 @@ const Header = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Nav */}
       {isMenuOpen && (
-        <div className="md:hidden bg-[#1e2619] text-white/75 px-5 py-4 space-y-3 transition-all duration-300 ease-in-out">
+        <div className="md:hidden bg-[#1e2619] text-white/75 px-5 py-4 space-y-3">
           <div className="flex flex-col gap-2 font-medium">
-            <Link to="/" onClick={closeMenu} className="cursor-pointer hover:text-green-300">Home</Link>
-
+            <Link to="/" onClick={closeMenu} className="hover:text-green-300">Home</Link>
             <div>
               <span onClick={togglePlantTypes} className="block hover:text-green-300 cursor-pointer">
                 Plant Types
@@ -117,28 +125,24 @@ const Header = () => {
                 </div>
               )}
             </div>
+            <Link to="/contact" onClick={closeMenu} className="hover:text-green-300">Contact</Link>
 
-            <Link to="/contact" onClick={closeMenu} className="cursor-pointer hover:text-green-300">Contact</Link>
-
-            {/* Mobile Auth Buttons */}
-            <div className="flex flex-col gap-2 mt-4">
-              {isAuthenticated ? (
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    closeMenu();
-                  }}
-                  className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm text-left"
-                >
-                  Log Out
-                </button>
-              ) : (
-                <>
-                  <Link to="/login" onClick={closeMenu} className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">Login</Link>
-                  <Link to="/register" onClick={closeMenu} className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md transition-all duration-300 text-sm">Register</Link>
-                </>
-              )}
-            </div>
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  closeMenu();
+                }}
+                className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md text-left text-sm"
+              >
+                Log Out
+              </button>
+            ) : (
+              <>
+                <Link to="/login" onClick={closeMenu} className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md text-sm">Login</Link>
+                <Link to="/register" onClick={closeMenu} className="bg-[#2c352b] border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md text-sm">Register</Link>
+              </>
+            )}
           </div>
         </div>
       )}

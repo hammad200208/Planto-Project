@@ -30,9 +30,9 @@ const Login = () => {
 
       if (response.ok) {
         // alert('Login successful!');
-        console.log('User:', data);
-        localStorage.setItem('authToken', data.token);
-        login(data.token); // ✅ update context & save token
+        // console.log('User:', data);
+    
+        login(data.Token, data.users); // ✅ update context & save token
         navigate('/'); // ✅ go to homepage
       } else {
         alert(data.message || 'Invalid credentials');

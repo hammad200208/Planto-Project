@@ -8,11 +8,13 @@ import Login from "./components/Pages/Login";
 import Register from "./components/Pages/Register";
 import AuthProvider from "./Context/AuthProvider"; // ✅ Corrected
 import AddToCard from "./components/Pages/AddToCard"
+import { CartProvider } from "./Context/CartContext";
 import "./App.css";
 
 function App() {
   return (
     <AuthProvider>
+      <CartProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Planto />} />
@@ -25,6 +27,7 @@ function App() {
           <Route path="/addtocard" element={<AddToCard />} />
         </Routes>
       </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }
