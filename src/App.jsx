@@ -10,6 +10,7 @@ import AuthProvider from "./Context/AuthProvider"; // ✅ Corrected
 import AddToCard from "./components/Pages/AddToCard"
 import { CartProvider } from "./Context/CartContext";
 import "./App.css";
+import OrderHistory from "./components/Pages/OrderHistory";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/addtocard" element={<AddToCard />} />
+          <Route path="/history" element={<OrderHistory />} />
         </Routes>
       </Router>
       </CartProvider>

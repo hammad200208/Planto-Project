@@ -12,11 +12,12 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
-      const existing = prevItems.find(item => item.id === product.id);
+      // Use _id for identification consistently
+      const existing = prevItems.find(item => item._id === product._id);
       if (existing) {
         return prevItems.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+          item._id === product._id
+            ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
         );
       } else {
@@ -26,12 +27,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const getTotalQuantity = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+    return cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
   };
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, getTotalQuantity, setCartItems }} // ✅ INCLUDED
+      value={{ cartItems, addToCart, getTotalQuantity, setCartItems }}
     >
       {children}
     </CartContext.Provider>

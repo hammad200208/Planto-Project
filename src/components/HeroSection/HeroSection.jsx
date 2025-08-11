@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { FaStar, FaPlay, FaStarHalfAlt, FaArrowRight } from 'react-icons/fa';
-import { useCart } from "../../Context/CartContext"; // ✅ Import context
+import { useCart } from "../../Context/CartContext";
+import { AuthContext } from "../../Context/AuthContext";
+import { toast } from 'react-toastify';
 
 const HeroSection = () => {
   const [productCards, setProductCards] = useState([]);
   const [index, setIndex] = useState(0);
-  const { addToCart } = useCart(); // ✅ Destructure addToCart from context
+  const { addToCart } = useCart();
+  const { user } = useContext(AuthContext);
 
-  // Fetch plants from API
   useEffect(() => {
     fetch('https://eb-project-backend-kappa.vercel.app/api/v0/plants/getAll')
       .then((res) => res.json())
@@ -21,27 +23,54 @@ const HeroSection = () => {
   const current = productCards[index] || {
     image: '',
     plantname: 'Loading...',
-    description: 'Please wait while we load the plant info.',
     price: '...',
     _id: null
   };
 
-  // ✅ Replace localStorage logic with Context
-  const handleBuyNow = () => {
-    if (!current._id) return;
+  const handleBuyNow = async () => {
+    console.log("Current plant ID:", current?._id);
+    console.log("User ID:", user?._id);
+    if (!current._id || !user?._id) {
+      toast.error("Missing user or plant information");
+      return;
+    }
 
-    const productToAdd = {
-      id: current._id,
-      name: current.plantname,
-      price: current.price,
-      image: current.image,
+    const payload = {
+      plantId: current._id,
+      quantity: 1,
+      userId: user._id,
+      price: current.price
     };
 
-    addToCart(productToAdd);
-    alert("Added to cart!");
+    try {
+      const response = await fetch("https://eb-project-backend-kappa.vercel.app/api/v0/plants/addToCart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        addToCart({
+          _id: current._id,
+          plantname: current.plantname,
+          price: current.price,
+          image: current.image
+        });
+
+        toast.success("Added to cart!");
+      } else {
+        toast.error(data.message || "Failed to add to cart.");
+      }
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error("Something went wrong.");
+    }
   };
 
   const nextCard = () => {
+    if (productCards.length === 0) return;
     setIndex((prevIndex) => (prevIndex + 1) % productCards.length);
   };
 
@@ -113,7 +142,7 @@ const HeroSection = () => {
 
             {/* Card Content */}
             <div className="flex flex-col items-start px-4 sm:px-5 mt-12">
-              <p className="text-white mb-1 mt-4 text-sm sm:text-base">{current.description}</p>
+              <p className="text-white mb-1 mt-4 text-sm sm:text-base">{current.type || "Unknown Type"}</p>
               <h1 className="text-[#FFFFFFBF] text-xl sm:text-2xl mb-1">{current.plantname}</h1>
               <p className="text-white text-sm sm:text-base mb-4">Rs. {current.price}/-</p>
               <button
@@ -125,7 +154,7 @@ const HeroSection = () => {
             </div>
 
             {/* Dots */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 md:-my-3">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 md:-my-1">
               {productCards.map((_, dotIndex) => (
                 <button
                   key={dotIndex}

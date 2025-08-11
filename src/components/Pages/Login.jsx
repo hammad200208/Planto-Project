@@ -5,6 +5,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
 import { AuthContext } from '../../Context/AuthContext'; // ✅ use your AuthContext
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,17 +30,17 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // alert('Login successful!');
+        toast.success('Login successful!');
         // console.log('User:', data);
     
         login(data.Token, data.users); // ✅ update context & save token
         navigate('/'); // ✅ go to homepage
       } else {
-        alert(data.message || 'Invalid credentials');
+        toast.error(data.message || 'Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
     }
   };
 
