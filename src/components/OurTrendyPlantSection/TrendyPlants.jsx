@@ -9,18 +9,15 @@ const TrendyPlants = () => {
       .then((data) => {
         console.log('Fetched trendy plants:', data);
         if (data?.data) {
-          setPlants(data.data.slice(0, 3)); // First 3 plants
+          setPlants(data.data.slice(0, 2)); // Only first 2 plants
         }
       })
       .catch((err) => console.error('Error fetching trendy plants:', err));
   }, []);
 
-  // ✅ Helper to get full image URL
   const getImageUrl = (path) => {
-    if (!path) return '';
-    return path.startsWith('http')
-      ? path
-      : `https://eb-project-backend-kappa.vercel.app/${path}`;
+    if (!path) return '/placeholder.png';
+    return path.startsWith('http') ? path : `https://eb-project-backend-kappa.vercel.app/${path}`;
   };
 
   const BagIcon = () => (
@@ -43,75 +40,52 @@ const TrendyPlants = () => {
   );
 
   return (
-    <section className="px-4 sm:px-6 py-4 sm:py-12 text-white">
+    <section className="px-4 sm:px-6 py-12 text-white">
       <img
         src="/Group 51 (1).png"
         alt="Heading"
-        className="w-full max-w-md h-auto mx-auto mb-6 sm:mb-8 drop-shadow-lg"
+        className="w-full max-w-md h-auto mx-auto mb-8 drop-shadow-lg"
       />
 
-      {plants.length === 3 ? (
-        <>
-          {/* First Plant Card */}
-          <div className="w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6 sm:gap-8 bg-[rgba(255,255,255,0.05)] rounded-3xl sm:rounded-[80px] shadow-md p-4 sm:p-6 border mb-8 sm:mb-12">
-            <img
-              src={getImageUrl(plants[2].image)}
-              alt={plants[2].plantname}
-              className="w-full max-w-[300px] md:w-[300px] h-auto object-contain -mt-20 md:-mt-30 mx-auto md:mx-0"
-            />
-            <div className="flex flex-col justify-between flex-1 w-full">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">
-                  {plants[2].plantname}
-                </h3>
-                <p className="text-white text-sm sm:text-base mb-3 sm:mb-4">
-                  {plants[2].description}
-                </p>
-                <p className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">
-                  Rs.{plants[2].price}/-
-                </p>
-              </div>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <button className="bg-transparent text-white px-4 sm:px-5 py-1 sm:py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
-                  Buy Now
-                </button>
-                <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px] hover:bg-[#3f483f] cursor-pointer">
-                  <BagIcon />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Second Plant Card (Reversed) */}
-          <div className="w-full md:h-[300px] pt-8 md:pt-20 max-w-4xl mx-auto flex flex-col md:flex-row-reverse items-center gap-6 sm:gap-8 bg-[rgba(255,255,255,0.05)] rounded-3xl sm:rounded-[80px] shadow-md p-4 sm:p-6 border">
-            <img
-              src={getImageUrl(plants[1].image)}
-              alt={plants[1].plantname}
-              className="w-full max-w-[300px] md:w-[300px] h-auto object-contain -mt-20 md:-mt-30 mx-auto md:mx-0"
-            />
-            <div className="flex flex-col justify-between flex-1 w-full">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-semibold md:-mt-15 sm:mb-3">
-                  {plants[1].plantname}
-                </h3>
-                <p className="text-white text-sm sm:text-base mb-3 sm:mb-4">
-                  {plants[1].description}
-                </p>
-                <p className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">
-                  Rs.{plants[1].price}/-
-                </p>
-              </div>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <button className="bg-transparent text-white px-4 sm:px-5 py-1 sm:py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
-                  Buy Now
-                </button>
-                <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px] hover:bg-[#3f483f] cursor-pointer">
-                  <BagIcon />
-                </button>
+      {plants.length > 0 ? (
+        plants.map((plant, idx) => {
+          const isReversed = idx === 1; // reverse layout for second plant
+          return (
+            <div
+              key={plant?._id || idx}
+              className={`w-full max-w-4xl mx-auto  flex flex-col ${
+                isReversed ? 'md:flex-row-reverse' : 'md:flex-row'
+              } items-center gap-6 bg-[rgba(255,255,255,0.05)] rounded-3xl sm:rounded-[80px] shadow-md p-6 md:p-8 border mb-8 md:mb-12`}
+            >
+              <img
+                src={getImageUrl(plant?.image)}
+                alt={plant?.plantname || 'Plant'}
+                className="w-full max-w-[300px] md:w-[300px] h-auto object-contain -mt-20 md:-mt-20 mx-auto md:mx-0"
+              />
+              <div className="flex flex-col justify-between flex-1 w-full">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">
+                    {plant?.plantname || 'Unknown Plant'}
+                  </h3>
+                  <p className="text-white text-sm sm:text-base mb-3 sm:mb-4">
+                    {plant?.description || 'No description available.'}
+                  </p>
+                  <p className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">
+                    Rs.{plant?.price || 'N/A'}/-
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <button className="bg-transparent text-white px-4 sm:px-5 py-2 rounded-xl sm:rounded-[15px] border text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer">
+                    Buy Now
+                  </button>
+                  <button className="flex items-center justify-center gap-2 border bg-transparent p-2 sm:px-3 sm:py-2 rounded-xl sm:rounded-[13px] hover:bg-[#3f483f] cursor-pointer">
+                    <BagIcon />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </>
+          );
+        })
       ) : (
         <p className="text-center text-white mt-12">Loading plants...</p>
       )}

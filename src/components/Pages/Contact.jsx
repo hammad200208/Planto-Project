@@ -1,23 +1,45 @@
 import React from 'react';
-import { FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaClock, FaFacebookF, FaInstagram, FaTwitter, FaPinterestP } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
+import {
+  FaMapMarkerAlt,
+  FaEnvelope,
+  FaPhoneAlt,
+  FaClock,
+  FaFacebookF,
+  FaInstagram,
+  FaTwitter,
+  FaPinterestP
+} from 'react-icons/fa';
 
 const Contact = () => {
+  const contactDetails = [
+    { icon: FaMapMarkerAlt, title: 'Address', info: '123 Plant Street, Greenville, PL 12345' },
+    { icon: FaEnvelope, title: 'Email', info: 'contact@planto.example' },
+    { icon: FaPhoneAlt, title: 'Phone', info: '(123) 456-7890' },
+    { icon: FaClock, title: 'Business Hours', info: 'Monday - Friday: 9am - 5pm\nSaturday: 10am - 3pm' },
+  ];
+
+  const socialLinks = [
+    { icon: FaFacebookF, href: '#' },
+    { icon: FaInstagram, href: '#' },
+    { icon: FaTwitter, href: '#' },
+    { icon: FaPinterestP, href: '#' },
+  ];
+
   return (
     <>
-      <div className='bg-[#1c261a]'>
+      <div className="bg-[#1c261a]">
         <Header />
       </div>
+
       <div className="min-h-screen bg-[#1c261a]">
-        {/* Centered header */}
         <header className="bg-[#1e2619] py-6 px-5">
           <div className="max-w-6xl mx-auto text-center">
             <h1 className="text-2xl font-bold text-white/75">Contact Us</h1>
           </div>
         </header>
 
-        {/* Main content */}
         <main className="max-w-6xl mx-auto py-8 px-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Contact Form */}
@@ -64,59 +86,35 @@ const Contact = () => {
             <div className="bg-[#2c352b] border border-[#c7c9c6] rounded-[30px] p-6 shadow-md">
               <h2 className="text-xl font-semibold text-white mb-4">Contact Information</h2>
               <div className="space-y-4">
-                <div className="flex items-start">
-                  <FaMapMarkerAlt className="text-white mt-1 mr-3 w-5 h-5" />
-                  <div>
-                    <h3 className="text-white font-medium">Address</h3>
-                    <p className="text-[#cbcdca]">123 Plant Street, Greenville, PL 12345</p>
+                {contactDetails.map(({ icon, title, info }, idx) => (
+                  <div className="flex items-start" key={idx}>
+                    {React.createElement(icon, { className: "text-white mt-1 mr-3 w-5 h-5" })}
+                    <div>
+                      <h3 className="text-white font-medium">{title}</h3>
+                      {info.split('\n').map((line, i) => (
+                        <p key={i} className="text-[#cbcdca]">{line}</p>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start">
-                  <FaEnvelope className="text-white mt-1 mr-3 w-5 h-5" />
-                  <div>
-                    <h3 className="text-white font-medium">Email</h3>
-                    <p className="text-[#cbcdca]">contact@planto.example</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <FaPhoneAlt className="text-white mt-1 mr-3 w-5 h-5" />
-                  <div>
-                    <h3 className="text-white font-medium">Phone</h3>
-                    <p className="text-[#cbcdca]">(123) 456-7890</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <FaClock className="text-white mt-1 mr-3 w-5 h-5" />
-                  <div>
-                    <h3 className="text-white font-medium">Business Hours</h3>
-                    <p className="text-[#cbcdca]">Monday - Friday: 9am - 5pm</p>
-                    <p className="text-[#cbcdca]">Saturday: 10am - 3pm</p>
-                  </div>
-                </div>
+                ))}
               </div>
 
               {/* Social Media */}
               <div className="mt-6">
                 <h3 className="text-white font-medium mb-3">Follow Us</h3>
                 <div className="flex space-x-4 text-white">
-                  <a href="#" className="hover:text-green-300 transition-colors">
-                    <FaFacebookF className="w-6 h-6" />
-                  </a>
-                  <a href="#" className="hover:text-green-300 transition-colors">
-                    <FaInstagram className="w-6 h-6" />
-                  </a>
-                  <a href="#" className="hover:text-green-300 transition-colors">
-                    <FaTwitter className="w-6 h-6" />
-                  </a>
-                  <a href="#" className="hover:text-green-300 transition-colors">
-                    <FaPinterestP className="w-6 h-6" />
-                  </a>
+                  {socialLinks.map(({ icon, href }, idx) => (
+                    <a href={href} key={idx} className="hover:text-green-300 transition-colors">
+                      {React.createElement(icon, { className: "w-6 h-6" })}
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </main>
       </div>
+
       <Footer />
     </>
   );

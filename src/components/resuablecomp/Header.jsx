@@ -1,15 +1,14 @@
-
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Context/AuthContext';
-import { useCart } from '../../Context/CartContext'; // ✅ Use the cart context directly
+import { useCart } from '../../Context/CartContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPlantTypesOpen, setIsPlantTypesOpen] = useState(false);
   const { isAuthenticated, logout } = useContext(AuthContext);
-  const { getTotalQuantity } = useCart(); // ✅ Get quantity from context
-  const cartCount = getTotalQuantity(); // ✅ Auto-updated
+  const { getTotalQuantity } = useCart();
+  const cartCount = getTotalQuantity?.() || 0; // ✅ optional chaining
 
   const navigate = useNavigate();
 
@@ -18,7 +17,7 @@ const Header = () => {
   const closeMenu = () => setIsMenuOpen(false);
 
   const handleLogout = () => {
-    logout();
+    logout?.();
     navigate('/login');
   };
 
@@ -62,7 +61,7 @@ const Header = () => {
         <div className="flex items-center gap-4 text-white relative">
           <img src="/search.png" alt="Search" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
 
-          {/* ✅ Live Cart Icon */}
+          {/* Cart */}
           <Link to="/addtocard" className="relative">
             <img src="/bag.png" alt="Bag" className="hidden sm:block w-6 h-6 cursor-pointer hover:opacity-80" />
             {cartCount > 0 && (
@@ -115,9 +114,7 @@ const Header = () => {
           <div className="flex flex-col gap-2 font-medium">
             <Link to="/" onClick={closeMenu} className="hover:text-green-300">Home</Link>
             <div>
-              <span onClick={togglePlantTypes} className="block hover:text-green-300 cursor-pointer">
-                Plant Types
-              </span>
+              <span onClick={togglePlantTypes} className="block hover:text-green-300 cursor-pointer">Plant Types</span>
               {isPlantTypesOpen && (
                 <div className="ml-4 mt-2 space-y-1 text-sm">
                   <Link to="/indoor" onClick={closeMenu} className="block hover:text-green-300">Indoor</Link>
@@ -130,10 +127,7 @@ const Header = () => {
 
             {isAuthenticated ? (
               <button
-                onClick={() => {
-                  handleLogout();
-                  closeMenu();
-                }}
+                onClick={() => { handleLogout(); closeMenu(); }}
                 className="bg-transparent border border-[#c7c9c6] hover:bg-[#c7c9c6] hover:text-[#1c261a] text-white px-4 py-1.5 rounded-md text-left text-sm"
               >
                 Log Out

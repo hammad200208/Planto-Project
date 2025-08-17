@@ -4,12 +4,12 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
-import { AuthContext } from '../../Context/AuthContext'; // ✅ use your AuthContext
+import { AuthContext } from '../../Context/AuthContext'; 
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // ✅ get login function from context
+  const { login } = useContext(AuthContext); 
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,8 +33,8 @@ const Login = () => {
         toast.success('Login successful!');
         // console.log('User:', data);
     
-        login(data.Token, data.users); // ✅ update context & save token
-        navigate('/'); // ✅ go to homepage
+        login(data.Token, data.users); 
+        navigate('/'); 
       } else {
         toast.error(data.message || 'Invalid credentials');
       }

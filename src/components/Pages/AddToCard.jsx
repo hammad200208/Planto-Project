@@ -5,142 +5,106 @@ import { GiPlantSeed } from "react-icons/gi";
 import { useCart } from "../../Context/CartContext";
 import { AuthContext } from "../../Context/AuthContext";
 import { AiOutlinePlus, AiOutlineMinus, AiFillDelete } from "react-icons/ai";
+import { FaHistory } from "react-icons/fa";
+import { MdClearAll } from "react-icons/md";
+import { BsCartCheck } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 const AddToCard = () => {
   const { cartItems, setCartItems } = useCart();
-  const { user, isAuthenticated, loading } = useContext(AuthContext);
-  const [ordering, setOrdering] = useState(false);
+  const { user, loading } = useContext(AuthContext);
   const [loadingCart, setLoadingCart] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch cart from backend on mount or user change
   useEffect(() => {
     const fetchCart = async () => {
       if (!user?._id) return;
-
-
       setLoadingCart(true);
       try {
         const res = await axios.get(
-          `https://eb-project-backend-kappa.vercel.app/api/v0/plants/getCart/${user._id}`
+          `https://eb-project-backend-kappa.vercel.app/api/v0/plants/getCart/${user?._id}`
         );
-        // Expecting res.data.cartItems to be an array of items with consistent keys
-        // console.log("Cart fetched from backend:", res.data.data);
-        setCartItems(res.data.data || []);
-        // console.log("Set cart items to:", res.data.cartItems)
-      } catch (err) {
-        console.error("Failed to fetch cart from API", err);
+        setCartItems(res?.data?.data || []);
+      } catch (error) {
+        console.error("Error fetching cart:", error);
         toast.error("Failed to load cart from server.");
       } finally {
         setLoadingCart(false);
       }
     };
-
     fetchCart();
   }, [user?._id, setCartItems]);
-  console.log("Cart Items in AddToCard:", cartItems);
 
-  // Delete cart item by plantId
   const handleDeleteItem = async (plantId, userId) => {
-    // if (!user?._id || !plantId) return;
-    console.log(userId) 
-    console.log(plantId)
     try {
-     const response = await axios.delete(
+      await axios.delete(
         `https://eb-project-backend-kappa.vercel.app/api/v0/plants/removeFromCart/${userId}/${plantId}`
       );
-      console.log(response)
-      setCartItems((prev) => prev.filter((item) => (item._id || item.id) !== plantId));
+      setCartItems((prev) =>
+        prev.filter(
+          (item) => (item.plantId?._id || item.plantId) !== plantId
+        )
+      );
+      setSelectedItems((prev) => prev.filter((id) => id !== plantId));
       toast.success("Item removed from cart.");
-    } catch (err) {
-      console.error("Delete failed", err); 
-      toast.error("Failed to remove item from cart.");
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Failed to remove item.");
     }
   };
 
-  // Increment quantity locally
-  const handleIncrement = (index) => {
-    const updatedCart = [...cartItems];
-    updatedCart[index].quantity = (updatedCart[index].quantity || 1) + 1;
-    setCartItems(updatedCart);
+  const handleIncrement = (i) => {
+    const updated = [...cartItems];
+    updated[i].quantity = (updated[i]?.quantity || 1) + 1;
+    setCartItems(updated);
   };
 
-  // Decrement quantity locally (minimum 1)
-  const handleDecrement = (index) => {
-    const updatedCart = [...cartItems];
-    if ((updatedCart[index].quantity || 1) > 1) {
-      updatedCart[index].quantity -= 1;
-      setCartItems(updatedCart);
+  const handleDecrement = (i) => {
+    const updated = [...cartItems];
+    if ((updated[i]?.quantity || 1) > 1) {
+      updated[i].quantity -= 1;
+      setCartItems(updated);
     }
   };
 
-  // Calculate total amount
-  const calculateTotal = () => {
-    return cartItems.reduce(
-      (sum, item) => sum + (parseInt(item.price, 10) || 0) * (item.quantity || 1),
-      0
+  const toggleSelect = (id) => {
+    setSelectedItems((prev) =>
+      prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id]
     );
   };
 
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
-
-  // Place order handler
-  const handleOrderNow = async () => {
-    if (!isAuthenticated || !user?._id) {
-      toast.error("🚫 Please log in to place an order.");
-      return;
-    }
-
-    if (cartItems.length === 0) {
-      toast.error("🛒 Your cart is empty.");
-      return;
-    }
-
-    setOrdering(true);
-    try {
-      // Build payload with product info including quantity and price
-      const products = cartItems.map(item => ({
-        productId: item._id || item.id || item.plantId,
-        quantity: item.quantity || 1,
-        price: item.price,
-      }));
-
-      const payload = {
-        userId: user._id,
-        products,
-        totalAmount: calculateTotal(),
-        status: "pending",
-      };
-
-      console.log("Order Payload:", payload);
-
-      const res = await fetch(
-        "https://eb-project-backend-kappa.vercel.app/api/v0/orders/createOrder",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
+  const calculateTotal = () =>
+    cartItems
+      .filter((item) =>
+        selectedItems.includes(item.plantId?._id || item.plantId)
+      )
+      .reduce(
+        (sum, item) =>
+          sum + (parseInt(item?.price || 0, 10) * (item?.quantity || 1)),
+        0
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to place order");
-      }
+  const handleClearCart = () => {
+    setCartItems([]);
+    setSelectedItems([]);
+  };
 
-      toast.success("✅ Order placed successfully!");
-      handleClearCart();
-      navigate("/history");
-    } catch (error) {
-      console.error("Order Error:", error);
-      toast.error("🚫 Something went wrong while placing the order.");
-    } finally {
-      setOrdering(false);
+  const handleProceedToOrder = () => {
+    const selectedCartItems = cartItems.filter((item) =>
+      selectedItems.includes(item.plantId?._id || item.plantId)
+    );
+
+    if (selectedCartItems.length === 0) {
+      toast.error("Please select at least one item to order.");
+      return;
     }
+
+    navigate("/order", { state: { selectedCartItems } });
   };
 
   if (loading || loadingCart) {
@@ -160,95 +124,119 @@ const AddToCard = () => {
           Added to Cart
         </h1>
 
+        {/* History Button */}
         <div className="flex justify-end mb-6">
           <button
             onClick={() => navigate("/history")}
-            className="px-4 py-2 border border-white text-white rounded hover:bg-[#2c352b] transition"
+            className="flex items-center gap-2 px-4 py-2 border border-white text-white rounded hover:bg-[#2c352b] transition"
           >
-            🕘 History
+            <FaHistory className="text-lg" />
+            History
           </button>
         </div>
 
-        {cartItems.length === 0 ? (
+        {cartItems?.length === 0 ? (
           <p>No items in cart.</p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {cartItems?.map((project, index) => ( 
-                <div
-                  key={project._id || project.id || index}
-                  className="bg-[#2c352b] rounded-xl p-4 border border-white/20 flex items-center gap-4"
-                >
-                  <img
-                    src={project.image || "/plant-placeholder.png"}
-                    alt={project.plantname || project.name || "Plant image"}
-                    className="w-20 h-20 object-cover rounded-lg border border-white/10"
-                  />
+              {cartItems?.map((project, index) => {
+                const plantData =
+                  typeof project?.plantId === "object" ? project?.plantId : {};
+                const plantId = plantData?._id || project?.plantId;
 
-                  <div className="flex-1 space-y-1">
-                    <h2 className="text-lg font-semibold text-white">
-                      {project.plantname || project.name}
-                    </h2>
-                    <p className="text-sm text-white/60">
-                      Type: {project.type || "N/A"}
-                    </p>
-                    <p className="font-medium text-green-300">
-                      Rs.{" "}
-                      {(parseInt(project.price, 10) || 0) * (project.quantity || 1)}
-                      /-
-                      <span className="text-sm text-white/50">
-                        {" "}
-                        ({parseInt(project.price, 10) || 0} × {project.quantity || 1})
-                      </span>
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-1">
-                      <button
-                        onClick={() => handleDecrement(index)}
-                        className="bg-white text-black px-2 rounded hover:bg-gray-300"
-                      >
-                        <AiOutlineMinus />
-                      </button>
-                      <span className="w-6 text-center">{project.quantity || 1}</span>
-                      <button
-                        onClick={() => handleIncrement(index)}
-                        className="bg-white text-black px-2 rounded hover:bg-gray-300"
-                      >
-                        <AiOutlinePlus />
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleDeleteItem(project.plantId._id, project.userId)}
-                    className="text-red-400 hover:text-red-600 text-xl"
-                    title="Remove item"
+                return (
+                  <div
+                    key={plantId || project?._id || index}
+                    className="bg-[#2c352b] rounded-xl p-4 border border-white/20 flex items-center gap-4"
                   >
-                    <AiFillDelete />
-                  </button>
-                </div>
-              ))}
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(plantId)}
+                      onChange={() => toggleSelect(plantId)}
+                      className="w-5 h-5 accent-green-500"
+                    />
+
+                    <img
+                      src={project?.image || plantData?.image || "/plant-placeholder.png"}
+                      alt={
+                        project?.plantname ||
+                        plantData?.plantname ||
+                        project?.name ||
+                        "Plant"
+                      }
+                      className="w-20 h-20 object-cover rounded-lg border border-white/10"
+                    />
+
+                    <div className="flex-1 space-y-1">
+                      <h2 className="text-lg font-semibold text-white">
+                        {project?.plantname || plantData?.plantname || project?.name}
+                      </h2>
+                      <p className="text-sm text-white/60">
+                        Type: {project?.type || plantData?.type || "N/A"}
+                      </p>
+                      <p className="font-medium text-green-300">
+                        Rs.{" "}
+                        {(parseInt(project?.price || plantData?.price, 10) || 0) *
+                          (project?.quantity || 1)}
+                        /-
+                        <span className="text-sm text-white/50">
+                          {" "}
+                          ({parseInt(project?.price || plantData?.price, 10) || 0} ×{" "}
+                          {project?.quantity || 1})
+                        </span>
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button
+                          onClick={() => handleDecrement(index)}
+                          className="bg-white text-black px-2 rounded hover:bg-gray-300"
+                        >
+                          <AiOutlineMinus />
+                        </button>
+                        <span className="w-6 text-center">
+                          {project?.quantity || 1}
+                        </span>
+                        <button
+                          onClick={() => handleIncrement(index)}
+                          className="bg-white text-black px-2 rounded hover:bg-gray-300"
+                        >
+                          <AiOutlinePlus />
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteItem(plantId, project?.userId)}
+                      className="text-red-400 hover:text-red-600 text-xl"
+                      title="Remove item"
+                    >
+                      <AiFillDelete />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="text-xl font-bold text-green-300 mb-6">
               Total: Rs. {calculateTotal()}/-
             </div>
-
             <div className="flex gap-4 flex-wrap">
+              {/* Clear Cart */}
               <button
                 onClick={handleClearCart}
-                className="px-4 py-2 border border-white rounded hover:bg-red-600 transition"
+                className="flex items-center gap-2 px-4 py-2 border border-white rounded hover:bg-red-600 transition"
               >
+                <MdClearAll className="text-lg" />
                 Clear Cart
               </button>
+
+              {/* Proceed to Order */}
               <button
-                onClick={handleOrderNow}
-                disabled={ordering}
-                className={`px-4 py-2 border border-white rounded transition ${
-                  ordering ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
-                }`}
+                onClick={handleProceedToOrder}
+                className="flex items-center gap-2 px-4 py-2 border border-white rounded hover:bg-green-600 transition"
               >
-                {ordering ? "Ordering..." : "Order Now"}
+                <BsCartCheck className="text-lg" />
+                Proceed to Order
               </button>
             </div>
           </>

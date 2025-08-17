@@ -1,141 +1,117 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Header from "../resuablecomp/Header";
+import Footer from "../resuablecomp/Footer";
 import { toast } from "react-toastify";
 
-const OrderHistory = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [orderHistory, setOrderHistory] = useState([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [loadingHistory, setLoadingHistory] = useState(false);
+// React Icons
+import { FaBoxOpen } from "react-icons/fa";
+import { FaUserAlt, FaCalendarAlt } from "react-icons/fa";
+import { MdOutlineAttachMoney } from "react-icons/md";
+import { BiPurchaseTagAlt } from "react-icons/bi";
+import { AiOutlineNumber } from "react-icons/ai";
 
-  // ✅ Load Cart Items on Mount
+const OrderHistory = () => {
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    fetchCartItems();
+    const fetchOrder = async () => {
+      try {
+        const orderId = localStorage.getItem("lastOrderId");
+        if (!orderId) {
+          toast.error("⚠️ No recent order found.");
+          setLoading(false);
+          return;
+        }
+
+        console.log("📦 Fetching order with ID:", orderId);
+
+        const res = await axios.get(
+          `https://eb-project-backend-kappa.vercel.app/api/v0/orders/getOrder/${orderId}`
+        );
+
+        console.log("✅ Order API Response:", res.data);
+
+        setOrder(res.data?.data?.order || null);
+      } catch (error) {
+        console.error("❌ Failed to fetch order history:", error);
+        toast.error(error.response?.data?.message || "Failed to load order history");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrder();
   }, []);
 
-  const fetchCartItems = async () => {
-    try {
-      const storedCart = localStorage.getItem("plantoCart");
-      if (storedCart) {
-        setCartItems(JSON.parse(storedCart));
-      }
-    } catch (error) {
-      console.error("Error loading cart:", error);
-    }
-  };
+  if (loading) return <p className="text-center text-white">⏳ Loading order...</p>;
 
-  // ✅ Remove Item from Cart
-  const removeFromCart = (id) => {
-    const updatedCart = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCart);
-    localStorage.setItem("plantoCart", JSON.stringify(updatedCart));
-    toast.success("Item removed from cart");
-  };
-
-  // ✅ Place Order
-  const placeOrder = async () => {
-    if (cartItems.length === 0) {
-      toast.error("Your cart is empty!");
-      return;
-    }
-
-    try {
-      await axios.post("http://localhost:5000/api/orders", {
-        items: cartItems,
-      });
-
-      toast.success("Order placed successfully!");
-      localStorage.removeItem("plantoCart");
-      setCartItems([]);
-    } catch (error) {
-      console.error("Order error:", error);
-      toast.error("Failed to place order");
-    }
-  };
-
-  // ✅ Fetch Order History
-  const fetchOrderHistory = async () => {
-    setLoadingHistory(true);
-    try {
-      const res = await axios.get("http://localhost:5000/api/orders");
-      setOrderHistory(res.data || []);
-      setShowHistory(true);
-    } catch (error) {
-      console.error("History fetch error:", error);
-      toast.error("Failed to fetch order history");
-    } finally {
-      setLoadingHistory(false);
-    }
-  };
+  if (!order) return <p className="text-center text-white">⚠️ No order history found.</p>;
 
   return (
-    <div className="px-6 py-10">
-      <h2 className="text-2xl font-bold mb-4">🛒 Your Cart</h2>
+    <div className="bg-[#151d14] min-h-screen text-white">
+      <Header />
+      <div className="container mx-auto py-10">
+        <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+          <FaBoxOpen className="text-green-400" /> Order History
+        </h2>
 
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        cartItems.map((item) => (
-          <div
-            key={item.id}
-            className="flex justify-between items-center bg-gray-100 p-4 mb-2 rounded"
-          >
-            <div>
-              <h3 className="font-semibold">{item.name}</h3>
-              <p>${item.price}</p>
-            </div>
-            <button
-              className="text-red-500"
-              onClick={() => removeFromCart(item.id)}
-            >
-              ❌ Remove
-            </button>
-          </div>
-        ))
-      )}
-
-      <div className="mt-4 flex gap-3">
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
-          onClick={placeOrder}
-        >
-          ✅ Place Order
-        </button>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={fetchOrderHistory}
-        >
-          📜 View Order History
-        </button>
-      </div>
-
-      {/* ✅ Order History Section */}
-      {showHistory && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">📜 Order History</h2>
-          {loadingHistory ? (
-            <p>Loading...</p>
-          ) : orderHistory.length === 0 ? (
-            <p>No past orders found.</p>
-          ) : (
-            orderHistory.map((order, index) => (
-              <div
-                key={index}
-                className="border p-4 mb-2 rounded bg-white shadow"
-              >
-                <p className="font-semibold">Order #{index + 1}</p>
-                <ul className="list-disc ml-5">
-                  {order.items?.map((item, idx) => (
-                    <li key={idx}>
-                      {item.name} - ${item.price}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          )}
+        {/* Order Details */}
+        <div className="bg-[#2c352b] p-6 rounded-lg shadow-md border border-white/20 space-y-3 mb-8">
+          <p className="flex items-center gap-2">
+            <AiOutlineNumber className="text-green-400" /> <strong>Order ID:</strong> {order._id}
+          </p>
+          <p className="flex items-center gap-2">
+            <FaUserAlt className="text-green-400" /> <strong>Customer:</strong> {order.customer?.name || order.customer}
+          </p>
+          <p className="flex items-center gap-2">
+            <FaUserAlt className="text-green-400" /> <strong>Email:</strong> {order.customer?.email || "N/A"}
+          </p>
+          <p className="flex items-center gap-2">
+            <MdOutlineAttachMoney className="text-green-400" /> <strong>Total:</strong> Rs. {order.total}
+          </p>
+          <p className="flex items-center gap-2">
+            <BiPurchaseTagAlt className="text-green-400" /> <strong>Status:</strong> {order.status}
+          </p>
+          <p className="flex items-center gap-2">
+            <FaCalendarAlt className="text-green-400" /> <strong>Ordered On:</strong> {new Date(order.createdAt).toLocaleString()}
+          </p>
         </div>
-      )}
+
+        {/* Products List Styled Like Cart */}
+        <h3 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+          <BiPurchaseTagAlt className="text-green-400" /> Ordered Products
+        </h3>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {order.products?.map((p, idx) => (
+            <div
+              key={idx}
+              className="bg-[#2c352b] p-4 rounded-xl shadow-md border border-white/20 flex flex-col items-center"
+            >
+              {/* Product Image */}
+              {p.product?.image && (
+                <img
+                  src={p.product.image}
+                  alt={p.product.plantname}
+                  className="w-32 h-32 object-cover rounded-lg mb-3"
+                />
+              )}
+
+              {/* Product Info */}
+              <h4 className="text-lg font-semibold">{p.product?.plantname}</h4>
+              <p className="text-sm text-gray-300">{p.product?.type}</p>
+              <p className="mt-2 font-medium">Rs. {p.product?.price}</p>
+
+              {/* Quantity */}
+              <div className="mt-3 bg-[#3a4639] px-4 py-1 rounded-lg flex items-center gap-2">
+                <AiOutlineNumber /> Quantity: {p.quantity}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { FaStar, FaPlay, FaStarHalfAlt, FaArrowRight } from 'react-icons/fa';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
+import { FaStar, FaStarHalfAlt, FaPlay, FaArrowRight } from 'react-icons/fa';
 import { useCart } from "../../Context/CartContext";
 import { AuthContext } from "../../Context/AuthContext";
 import { toast } from 'react-toastify';
@@ -9,43 +9,65 @@ const HeroSection = () => {
   const [index, setIndex] = useState(0);
   const { addToCart } = useCart();
   const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [buying, setBuying] = useState(false);
 
+  // Fetch plants
   useEffect(() => {
-    fetch('https://eb-project-backend-kappa.vercel.app/api/v0/plants/getAll')
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched plants:", data.data);
-        setProductCards(data.data);
-      })
-      .catch((err) => console.error('Failed to fetch hero plants:', err));
+    const fetchPlants = async () => {
+      try {
+        const res = await fetch('https://eb-project-backend-kappa.vercel.app/api/v0/plants/getAll');
+        const data = await res.json();
+        setProductCards(data?.data || []);
+      } catch (err) {
+        console.error('Failed to fetch hero plants:', err);
+        toast.error("Failed to load plants.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlants();
   }, []);
 
-  const current = productCards[index] || {
-    image: '',
-    plantname: 'Loading...',
-    price: '...',
-    _id: null
-  };
+  // Limit to first 3 cards (memoized)
+  const displayedCards = useMemo(() => productCards?.slice(0, 3) || [], [productCards]);
+  const current = displayedCards?.[index] || {};
 
+  // Auto-slide hero cards
+  useEffect(() => {
+    if ((displayedCards?.length || 0) < 2) return;
+    const interval = setInterval(() => {
+      setIndex(prev => (prev + 1) % displayedCards.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [displayedCards]);
+
+  // Buy Now handler
   const handleBuyNow = async () => {
-    console.log("Current plant ID:", current?._id);
-    console.log("User ID:", user?._id);
-    if (!current._id || !user?._id) {
-      toast.error("Missing user or plant information");
+    if (!user?._id) {
+      toast.error("You must be logged in to buy plants!");
+      return;
+    }
+    if (!current?._id) {
+      toast.error("Plant information is missing.");
       return;
     }
 
+    setBuying(true);
     const payload = {
-      plantId: current._id,
+      plantId: current?._id,
       quantity: 1,
-      userId: user._id,
-      price: current.price
+      userId: user?._id,
+      price: current?.price
     };
 
     try {
       const response = await fetch("https://eb-project-backend-kappa.vercel.app/api/v0/plants/addToCart", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${user?.token}`
+        },
         body: JSON.stringify(payload)
       });
 
@@ -53,26 +75,30 @@ const HeroSection = () => {
 
       if (response.ok) {
         addToCart({
-          _id: current._id,
-          plantname: current.plantname,
-          price: current.price,
-          image: current.image
+          _id: current?._id,
+          plantname: current?.plantname,
+          price: current?.price,
+          image: current?.image
         });
-
         toast.success("Added to cart!");
       } else {
-        toast.error(data.message || "Failed to add to cart.");
+        toast.error(data?.message || "Failed to add to cart.");
       }
     } catch (error) {
       console.error("Add to cart error:", error);
       toast.error("Something went wrong.");
+    } finally {
+      setBuying(false);
     }
   };
 
-  const nextCard = () => {
-    if (productCards.length === 0) return;
-    setIndex((prevIndex) => (prevIndex + 1) % productCards.length);
-  };
+  // Next card callback
+  const nextCard = useCallback(() => {
+    if ((displayedCards?.length || 0) === 0) return;
+    setIndex(prev => (prev + 1) % displayedCards.length);
+  }, [displayedCards]);
+
+  if (loading) return <div className="text-white text-center py-12">Loading plants...</div>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4 sm:px-6 py-8 sm:py-12">
@@ -115,59 +141,55 @@ const HeroSection = () => {
       </div>
 
       {/* Right Side Product Card */}
-      {productCards.length === 0 ? (
-        <div className="flex justify-center items-center pt-12 text-white">Loading plant card...</div>
-      ) : (
-        <div className="flex md:justify-end justify-center pt-12">
-          <div className="relative p-4 pt-20 border border-white/30 rounded-[30px] w-[250px] sm:w-[280px] h-[370px] sm:h-[390px] text-center bg-[#2c352b] transition-all duration-300 ease-in-out">
-            {/* Arrow Button */}
-            {productCards.length > 1 && (
-              <button
-                onClick={nextCard}
-                className="absolute top-1/2 right-4 transform -translate-y-1/2 text-white/70 hover:text-green-300 transition"
-                aria-label="Next Card"
-              >
-                <FaArrowRight size={20} />
-              </button>
-            )}
+      <div className="flex md:justify-end justify-center pt-12">
+        <div className="relative p-4 pt-20 border border-white/30 rounded-[30px] w-[250px] sm:w-[280px] h-[370px] sm:h-[390px] text-center bg-[#2c352b] transition-all duration-300 ease-in-out">
+          {displayedCards?.length > 1 && (
+            <button
+              onClick={nextCard}
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-white/70 hover:text-green-300 transition"
+              aria-label="Next Card"
+            >
+              <FaArrowRight size={20} />
+            </button>
+          )}
 
-            {/* Floating Image */}
-            <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
-              <img
-                src={current.image || "/placeholder.png"}
-                alt={current.plantname}
-                className="w-[120px] sm:w-[150px] h-[160px] sm:h-[180px] object-cover rounded"
+          {/* Floating Image */}
+          <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
+            <img
+              src={current?.image || "/placeholder.png"}
+              alt={current?.plantname || "Plant"}
+              className="w-[120px] sm:w-[150px] h-[160px] sm:h-[180px] object-cover rounded"
+            />
+          </div>
+
+          {/* Card Content */}
+          <div className="flex flex-col items-start px-4 sm:px-5 mt-12">
+            <p className="text-white mb-1 mt-4 text-sm sm:text-base">{current?.type || "Unknown Type"}</p>
+            <h1 className="text-[#FFFFFFBF] text-xl sm:text-2xl mb-1">{current?.plantname}</h1>
+            <p className="text-white text-sm sm:text-base mb-4">Rs. {current?.price}/-</p>
+            <button
+              onClick={handleBuyNow}
+              disabled={buying || !current?._id || !user?._id}
+              className="text-[#FFFFFFBF] border border-[#FFFFFFBF] px-4 py-2 rounded-[15px] text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {buying ? "Adding..." : "Buy Now"}
+            </button>
+          </div>
+
+          {/* Dots */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 md:-my-1">
+            {displayedCards?.map((_, dotIndex) => (
+              <button
+                key={dotIndex}
+                onClick={() => setIndex(dotIndex)}
+                className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition ${
+                  index === dotIndex ? 'bg-white' : 'bg-white/30'
+                }`}
               />
-            </div>
-
-            {/* Card Content */}
-            <div className="flex flex-col items-start px-4 sm:px-5 mt-12">
-              <p className="text-white mb-1 mt-4 text-sm sm:text-base">{current.type || "Unknown Type"}</p>
-              <h1 className="text-[#FFFFFFBF] text-xl sm:text-2xl mb-1">{current.plantname}</h1>
-              <p className="text-white text-sm sm:text-base mb-4">Rs. {current.price}/-</p>
-              <button
-                onClick={handleBuyNow}
-                className="text-[#FFFFFFBF] border border-[#FFFFFFBF] px-4 py-2 rounded-[15px] text-sm sm:text-base hover:bg-[#3f483f] cursor-pointer"
-              >
-                Buy Now
-              </button>
-            </div>
-
-            {/* Dots */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 md:-my-1">
-              {productCards.map((_, dotIndex) => (
-                <button
-                  key={dotIndex}
-                  onClick={() => setIndex(dotIndex)}
-                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition ${
-                    index === dotIndex ? 'bg-white' : 'bg-white/30'
-                  }`}
-                />
-              ))}
-            </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Header from '../resuablecomp/Header';
 import Footer from '../resuablecomp/Footer';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,56 +13,45 @@ const Register = () => {
     password: '',
     confirmPassword: ''
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
-    const { name, email, password, confirmPassword } = formData;
-
+    setLoading(true);
     try {
       const response = await fetch('https://eb-project-backend-kappa.vercel.app/api/v0/user/createUser', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, email, password, confirmPassword })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
 
       const data = await response.json();
-      console.log("Full response:", data); // Debugging aid
 
       if (response.ok) {
-        // alert("User registered successfully!");
-        console.log("Success:", data);
+        toast.success(data?.message || "Account created successfully!");
         navigate('/login');
       } else {
-        alert(data.message || "Registration failed!");
-        console.error("Error:", data);
+        toast.error(data?.message || "Registration failed!");
       }
     } catch (error) {
-      alert("Network error or server not responding.");
-      console.error("Error:", error);
+      toast.error(error?.message || "Network error or server not responding.");
+    } finally {
+      setLoading(false);
     }
   };
-
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   return (
     <>
@@ -69,11 +59,9 @@ const Register = () => {
         <Header />
       </div>
       <div className="min-h-screen bg-[#1c261a] flex flex-col justify-center md:pb-10 sm:px-6 lg:px-8">
-        <header className="bg-[#1e2619] py-6 px-5 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-white/75">Create Account</h1>
-            <p className="mt-2 text-sm text-[#cbcdca]">Join the Planto. community today</p>
-          </div>
+        <header className="bg-[#1e2619] py-6 px-5 sm:mx-auto sm:w-full sm:max-w-md text-center">
+          <h1 className="text-2xl font-bold text-white/75">Create Account</h1>
+          <p className="mt-2 text-sm text-[#cbcdca]">Join the Planto. community today</p>
         </header>
 
         <main className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -84,7 +72,7 @@ const Register = () => {
                 name="name"
                 label="Full Name"
                 type="text"
-                value={formData.name}
+                value={formData?.name}
                 onChange={handleChange}
               />
               <InputField
@@ -92,25 +80,25 @@ const Register = () => {
                 name="email"
                 label="Email address"
                 type="email"
-                value={formData.email}
+                value={formData?.email}
                 onChange={handleChange}
               />
               <PasswordField
                 id="password"
                 name="password"
                 label="Password"
+                value={formData?.password}
                 show={showPassword}
-                toggleShow={togglePasswordVisibility}
-                value={formData.password}
+                toggleShow={() => setShowPassword(!showPassword)}
                 onChange={handleChange}
               />
               <PasswordField
                 id="confirmPassword"
                 name="confirmPassword"
                 label="Confirm Password"
+                value={formData?.confirmPassword}
                 show={showConfirmPassword}
-                toggleShow={toggleConfirmPasswordVisibility}
-                value={formData.confirmPassword}
+                toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
                 onChange={handleChange}
               />
 
@@ -129,17 +117,15 @@ const Register = () => {
 
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#1c261a] bg-green-300 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-300 transition-all duration-300"
+                disabled={loading}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#1c261a] bg-green-300 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-300 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-[#cbcdca]">
-                Already have an account?{' '}
-                <Link to="/login" className="font-medium text-green-300 hover:text-green-200">Sign in</Link>
-              </p>
+            <div className="mt-6 text-center text-sm text-[#cbcdca]">
+              Already have an account? <Link to="/login" className="font-medium text-green-300 hover:text-green-200">Sign in</Link>
             </div>
           </div>
         </main>
@@ -152,9 +138,7 @@ const Register = () => {
 // 🔹 Reusable InputField
 const InputField = ({ id, name, label, type, value, onChange }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-[#cbcdca]">
-      {label}
-    </label>
+    <label htmlFor={id} className="block text-sm font-medium text-[#cbcdca]">{label}</label>
     <div className="mt-1">
       <input
         id={id}
@@ -172,9 +156,7 @@ const InputField = ({ id, name, label, type, value, onChange }) => (
 // 🔹 Reusable PasswordField
 const PasswordField = ({ id, name, label, value, onChange, show, toggleShow }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-[#cbcdca]">
-      {label}
-    </label>
+    <label htmlFor={id} className="block text-sm font-medium text-[#cbcdca]">{label}</label>
     <div className="mt-1 relative">
       <input
         id={id}
